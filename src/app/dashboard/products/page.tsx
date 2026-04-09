@@ -41,15 +41,15 @@ export default function ProductsPage() {
     <div className="p-6 max-w-7xl mx-auto space-y-5">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-display font-bold text-slate-800">Produk & Stok</h1>
-          <p className="text-slate-500 text-sm mt-1">{products?.length ?? 0} produk aktif</p>
+          <h1 className="text-2xl font-display font-bold text-slate-800 dark:text-slate-100">Produk & Stok</h1>
+          <p className="text-slate-500 dark:text-slate-500 text-sm mt-1">{products?.length ?? 0} produk aktif</p>
         </div>
         {canEdit && <button onClick={openAdd} className="btn-primary"><Plus size={16} /> Tambah Produk</button>}
       </div>
 
       <div className="flex gap-3 flex-wrap">
         <div className="relative flex-1 min-w-52">
-          <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+          <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500" />
           <input className="input pl-9" placeholder="Cari nama atau SKU..." value={search} onChange={e => setSearch(e.target.value)} />
         </div>
         <button onClick={() => setFilterLow(!filterLow)}
@@ -60,7 +60,7 @@ export default function ProductsPage() {
 
       <div className="card overflow-hidden">
         <table className="w-full">
-          <thead className="bg-slate-50 border-b border-slate-100">
+          <thead className="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-800">
             <tr>
               <th className="th">SKU</th><th className="th">Nama Produk</th><th className="th">Kategori</th>
               <th className="th text-right">Stok</th><th className="th text-right">Min</th>
@@ -69,21 +69,21 @@ export default function ProductsPage() {
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-50">
-            {isLoading && <tr><td colSpan={7} className="td text-center py-8 text-slate-400">Memuat...</td></tr>}
+            {isLoading && <tr><td colSpan={7} className="td text-center py-8 text-slate-400 dark:text-slate-500">Memuat...</td></tr>}
             {!isLoading && products?.length === 0 && (
-              <tr><td colSpan={7} className="td text-center py-12 text-slate-400">
+              <tr><td colSpan={7} className="td text-center py-12 text-slate-400 dark:text-slate-500">
                 <Package size={32} className="mx-auto mb-2 text-slate-200" /><p>Tidak ada produk</p>
               </td></tr>
             )}
             {products?.map((p: any) => {
               const s = getStockStatus(p.currentStock, p.minStock)
               return (
-                <tr key={p.id} className="hover:bg-slate-50">
-                  <td className="td font-mono text-xs text-slate-500">{p.sku}</td>
-                  <td className="td"><p className="font-medium text-slate-800">{p.name}</p>{p.description && <p className="text-xs text-slate-400 truncate max-w-48">{p.description}</p>}</td>
-                  <td className="td">{p.category ? <span className="badge bg-slate-100 text-slate-600">{p.category.name}</span> : <span className="text-slate-300">-</span>}</td>
-                  <td className="td text-right font-semibold">{p.currentStock.toLocaleString('id-ID')} <span className="font-normal text-xs text-slate-400">{p.unit}</span></td>
-                  <td className="td text-right text-slate-500">{p.minStock}</td>
+                <tr key={p.id} className="hover:bg-slate-50 dark:bg-slate-800/50">
+                  <td className="td font-mono text-xs text-slate-500 dark:text-slate-500">{p.sku}</td>
+                  <td className="td"><p className="font-medium text-slate-800 dark:text-slate-100">{p.name}</p>{p.description && <p className="text-xs text-slate-400 dark:text-slate-500 truncate max-w-48">{p.description}</p>}</td>
+                  <td className="td">{p.category ? <span className="badge bg-slate-100 text-slate-600 dark:text-slate-300">{p.category.name}</span> : <span className="text-slate-300">-</span>}</td>
+                  <td className="td text-right font-semibold">{p.currentStock.toLocaleString('id-ID')} <span className="font-normal text-xs text-slate-400 dark:text-slate-500">{p.unit}</span></td>
+                  <td className="td text-right text-slate-500 dark:text-slate-500">{p.minStock}</td>
                   <td className="td text-center"><span className={cn('badge', s.color)}>{s.label}</span></td>
                   {canEdit && <td className="td text-center"><button onClick={() => openEdit(p)} className="text-xs text-brand-600 hover:text-brand-800 font-medium">Edit</button></td>}
                 </tr>
@@ -96,10 +96,10 @@ export default function ProductsPage() {
       {/* Modal */}
       {modal && (
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md">
-            <div className="flex items-center justify-between p-5 border-b border-slate-100">
-              <h2 className="font-display font-semibold text-slate-800">{editing ? 'Edit Produk' : 'Tambah Produk'}</h2>
-              <button onClick={closeModal} className="text-slate-400 hover:text-slate-600"><X size={18} /></button>
+          <div className="bg-[var(--bg-surface)] rounded-2xl shadow-2xl w-full max-w-md">
+            <div className="flex items-center justify-between p-5 border-b border-slate-100 dark:border-slate-800">
+              <h2 className="font-display font-semibold text-slate-800 dark:text-slate-100">{editing ? 'Edit Produk' : 'Tambah Produk'}</h2>
+              <button onClick={closeModal} className="text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:text-slate-300"><X size={18} /></button>
             </div>
             <form onSubmit={e => { e.preventDefault(); mutation.mutate({ ...form, minStock: Number(form.minStock) }) }} className="p-5 space-y-4">
               <div className="grid grid-cols-2 gap-3">

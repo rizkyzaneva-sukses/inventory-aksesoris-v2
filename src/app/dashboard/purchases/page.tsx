@@ -51,15 +51,15 @@ export default function PurchasesPage() {
     <div className="p-6 max-w-7xl mx-auto space-y-5">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-display font-bold text-slate-800">Purchase Request</h1>
-          <p className="text-slate-500 text-sm mt-1">Permintaan pembelian aksesoris ke supplier</p>
+          <h1 className="text-2xl font-display font-bold text-slate-800 dark:text-slate-100">Purchase Request</h1>
+          <p className="text-slate-500 dark:text-slate-500 text-sm mt-1">Permintaan pembelian aksesoris ke supplier</p>
         </div>
         {['GUDANG', 'OWNER'].includes(role) && <button onClick={() => setModal(true)} className="btn-primary"><Plus size={16} /> Buat PR</button>}
       </div>
 
       <div className="card overflow-hidden">
         <table className="w-full">
-          <thead className="bg-slate-50 border-b border-slate-100">
+          <thead className="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-800">
             <tr>
               <th className="th">Invoice</th><th className="th">Tanggal</th><th className="th">Supplier</th>
               <th className="th">Dibuat Oleh</th><th className="th text-right">Total</th>
@@ -67,18 +67,18 @@ export default function PurchasesPage() {
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-50">
-            {isLoading && <tr><td colSpan={7} className="td text-center py-8 text-slate-400">Memuat...</td></tr>}
+            {isLoading && <tr><td colSpan={7} className="td text-center py-8 text-slate-400 dark:text-slate-500">Memuat...</td></tr>}
             {!isLoading && purchases?.length === 0 && (
-              <tr><td colSpan={7} className="td text-center py-12 text-slate-400">
+              <tr><td colSpan={7} className="td text-center py-12 text-slate-400 dark:text-slate-500">
                 <ShoppingCart size={32} className="mx-auto mb-2 text-slate-200" /><p>Belum ada Purchase Request</p>
               </td></tr>
             )}
             {purchases?.map((p: any) => (
-              <tr key={p.id} className="hover:bg-slate-50">
+              <tr key={p.id} className="hover:bg-slate-50 dark:bg-slate-800/50">
                 <td className="td font-mono text-xs font-medium">{p.invoiceNo}</td>
-                <td className="td text-slate-500">{formatDate(p.date)}</td>
-                <td className="td font-medium text-slate-700">{p.supplier.name}</td>
-                <td className="td text-slate-500">{p.createdBy.name}</td>
+                <td className="td text-slate-500 dark:text-slate-500">{formatDate(p.date)}</td>
+                <td className="td font-medium text-slate-700 dark:text-slate-200">{p.supplier.name}</td>
+                <td className="td text-slate-500 dark:text-slate-500">{p.createdBy.name}</td>
                 <td className="td text-right font-semibold">{formatCurrency(p.totalAmount)}</td>
                 <td className="td text-center"><span className={cn('badge', STATUS_COLOR[p.status])}>{p.status}</span></td>
                 <td className="td text-center">
@@ -89,7 +89,7 @@ export default function PurchasesPage() {
                       <CheckCircle size={13} /> PAY
                     </button>
                   )}
-                  {p.status === 'PAID' && <span className="text-xs text-slate-400">Lunas</span>}
+                  {p.status === 'PAID' && <span className="text-xs text-slate-400 dark:text-slate-500">Lunas</span>}
                 </td>
               </tr>
             ))}
@@ -100,10 +100,10 @@ export default function PurchasesPage() {
       {/* Modal buat PR */}
       {modal && (
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-            <div className="sticky top-0 bg-white flex items-center justify-between p-5 border-b border-slate-100">
-              <h2 className="font-display font-semibold text-slate-800">Buat Purchase Request</h2>
-              <button onClick={() => setModal(false)} className="text-slate-400 hover:text-slate-600"><X size={18} /></button>
+          <div className="bg-[var(--bg-surface)] rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div className="sticky top-0 bg-[var(--bg-surface)] flex items-center justify-between p-5 border-b border-slate-100 dark:border-slate-800">
+              <h2 className="font-display font-semibold text-slate-800 dark:text-slate-100">Buat Purchase Request</h2>
+              <button onClick={() => setModal(false)} className="text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:text-slate-300"><X size={18} /></button>
             </div>
             <form onSubmit={e => { e.preventDefault(); if (!items.length) return toast.error('Tambahkan minimal 1 item'); createMutation.mutate({ ...form, items }) }} className="p-5 space-y-5">
               <div className="grid grid-cols-2 gap-4">
@@ -122,10 +122,10 @@ export default function PurchasesPage() {
                   <label className="label mb-0">Item Pembelian *</label>
                   <button type="button" onClick={addItem} className="btn-secondary text-xs py-1 px-3"><Plus size={12} /> Tambah Item</button>
                 </div>
-                {items.length === 0 && <div className="border-2 border-dashed border-slate-200 rounded-lg p-6 text-center text-slate-400 text-sm">Klik "Tambah Item"</div>}
+                {items.length === 0 && <div className="border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-lg p-6 text-center text-slate-400 dark:text-slate-500 text-sm">Klik "Tambah Item"</div>}
                 <div className="space-y-2">
                   {items.map((item, i) => (
-                    <div key={i} className="grid grid-cols-12 gap-2 items-end p-3 bg-slate-50 rounded-lg">
+                    <div key={i} className="grid grid-cols-12 gap-2 items-end p-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg">
                       <div className="col-span-5">
                         {i === 0 && <label className="label text-xs">Produk</label>}
                         <select className="input" value={item.productId} onChange={e => updateItem(i, 'productId', e.target.value)} required>

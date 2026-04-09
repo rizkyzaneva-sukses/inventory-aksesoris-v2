@@ -11,8 +11,8 @@ const ACTION_LABELS: Record<string, { label: string; color: string }> = {
   CREATE_DELIVERY:        { label: 'Buat Delivery',    color: 'bg-orange-50 text-orange-700' },
   PAY_DELIVERY:           { label: 'Bayar Invoice',    color: 'bg-green-50 text-green-700' },
   TRANSFER_SALDO:         { label: 'Transfer Saldo',   color: 'bg-purple-50 text-purple-700' },
-  CREATE_PRODUCT:         { label: 'Tambah Produk',    color: 'bg-slate-100 text-slate-600' },
-  UPDATE_PRODUCT:         { label: 'Edit Produk',      color: 'bg-slate-100 text-slate-600' },
+  CREATE_PRODUCT:         { label: 'Tambah Produk',    color: 'bg-slate-100 text-slate-600 dark:text-slate-300' },
+  UPDATE_PRODUCT:         { label: 'Edit Produk',      color: 'bg-slate-100 text-slate-600 dark:text-slate-300' },
 }
 
 export default function AuditPage() {
@@ -45,15 +45,15 @@ export default function AuditPage() {
           <Shield size={18} className="text-white" />
         </div>
         <div>
-          <h1 className="text-2xl font-display font-bold text-slate-800">Audit Log</h1>
-          <p className="text-slate-500 text-sm mt-0.5">Semua aktivitas sistem — Owner only · {total} entri</p>
+          <h1 className="text-2xl font-display font-bold text-slate-800 dark:text-slate-100">Audit Log</h1>
+          <p className="text-slate-500 dark:text-slate-500 text-sm mt-0.5">Semua aktivitas sistem — Owner only · {total} entri</p>
         </div>
       </div>
 
       {/* Filters */}
       <div className="flex gap-3 flex-wrap">
         <div className="relative flex-1 min-w-52">
-          <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+          <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500" />
           <input className="input pl-9" placeholder="Cari aksi atau entitas..."
             value={search} onChange={e => { setSearch(e.target.value); setPage(1) }} />
         </div>
@@ -69,7 +69,7 @@ export default function AuditPage() {
       <div className="card overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-slate-50 border-b border-slate-100">
+            <thead className="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-800">
               <tr>
                 <th className="th">Waktu</th>
                 <th className="th">User</th>
@@ -81,11 +81,11 @@ export default function AuditPage() {
             </thead>
             <tbody className="divide-y divide-slate-50">
               {isLoading && (
-                <tr><td colSpan={6} className="td text-center py-8 text-slate-400">Memuat...</td></tr>
+                <tr><td colSpan={6} className="td text-center py-8 text-slate-400 dark:text-slate-500">Memuat...</td></tr>
               )}
               {!isLoading && logs.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="td text-center py-12 text-slate-400">
+                  <td colSpan={6} className="td text-center py-12 text-slate-400 dark:text-slate-500">
                     <Shield size={32} className="mx-auto mb-2 text-slate-200" />
                     <p>Belum ada log aktivitas</p>
                   </td>
@@ -96,11 +96,11 @@ export default function AuditPage() {
                 const badge = getRoleBadge(log.user?.role)
                 const detail = parseDetail(log.detail)
                 return (
-                  <tr key={log.id} className="hover:bg-slate-50">
-                    <td className="td text-xs text-slate-500 whitespace-nowrap">
+                  <tr key={log.id} className="hover:bg-slate-50 dark:bg-slate-800/50">
+                    <td className="td text-xs text-slate-500 dark:text-slate-500 whitespace-nowrap">
                       {formatDateTime(log.createdAt)}
                     </td>
-                    <td className="td font-medium text-slate-800">{log.user?.name ?? '-'}</td>
+                    <td className="td font-medium text-slate-800 dark:text-slate-100">{log.user?.name ?? '-'}</td>
                     <td className="td">
                       <span className={cn('badge text-xs', badge.color)}>{badge.label}</span>
                     </td>
@@ -109,11 +109,11 @@ export default function AuditPage() {
                         {actionMeta?.label ?? log.action}
                       </span>
                     </td>
-                    <td className="td text-slate-600 text-xs">
+                    <td className="td text-slate-600 dark:text-slate-300 text-xs">
                       <p>{log.entity}</p>
-                      {log.entityId && <p className="text-slate-400 font-mono truncate max-w-24">{log.entityId.slice(0, 8)}...</p>}
+                      {log.entityId && <p className="text-slate-400 dark:text-slate-500 font-mono truncate max-w-24">{log.entityId.slice(0, 8)}...</p>}
                     </td>
-                    <td className="td text-xs text-slate-500 max-w-xs">
+                    <td className="td text-xs text-slate-500 dark:text-slate-500 max-w-xs">
                       <p className="truncate">{detail ?? '-'}</p>
                     </td>
                   </tr>
@@ -125,8 +125,8 @@ export default function AuditPage() {
 
         {/* Pagination */}
         {totalPages > 1 && (
-          <div className="px-5 py-3 border-t border-slate-100 flex items-center justify-between">
-            <p className="text-xs text-slate-500">Halaman {page} dari {totalPages} · {total} total</p>
+          <div className="px-5 py-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+            <p className="text-xs text-slate-500 dark:text-slate-500">Halaman {page} dari {totalPages} · {total} total</p>
             <div className="flex gap-2">
               <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1}
                 className="btn-secondary text-xs py-1 px-3">← Prev</button>

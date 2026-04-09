@@ -38,8 +38,8 @@ export default function ReportsPage() {
   return (
     <div className="p-6 max-w-7xl mx-auto space-y-5">
       <div>
-        <h1 className="text-2xl font-display font-bold text-slate-800">Laporan</h1>
-        <p className="text-slate-500 text-sm mt-1">Analisa pembelian, delivery, dan posisi stok</p>
+        <h1 className="text-2xl font-display font-bold text-slate-800 dark:text-slate-100">Laporan</h1>
+        <p className="text-slate-500 dark:text-slate-500 text-sm mt-1">Analisa pembelian, delivery, dan posisi stok</p>
       </div>
 
       {/* Tabs + Date filter */}
@@ -48,7 +48,7 @@ export default function ReportsPage() {
           {TABS.map(t => (
             <button key={t.id} onClick={() => setTab(t.id)}
               className={cn('inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-colors border',
-                tab === t.id ? 'bg-brand-600 text-white border-brand-600' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50')}>
+                tab === t.id ? 'bg-brand-600 text-white border-brand-600' : 'bg-[var(--bg-surface)] text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:bg-slate-800/50')}>
               {t.icon}{t.label}
             </button>
           ))}
@@ -56,40 +56,40 @@ export default function ReportsPage() {
         {tab !== 'stock' && (
           <div className="flex items-center gap-2 text-sm">
             <input type="date" className="input py-1.5 w-36" value={from} onChange={e => setFrom(e.target.value)} />
-            <span className="text-slate-400">s/d</span>
+            <span className="text-slate-400 dark:text-slate-500">s/d</span>
             <input type="date" className="input py-1.5 w-36" value={to} onChange={e => setTo(e.target.value)} />
           </div>
         )}
       </div>
 
-      {isLoading && <div className="card p-8 text-center text-slate-400">Memuat laporan...</div>}
+      {isLoading && <div className="card p-8 text-center text-slate-400 dark:text-slate-500">Memuat laporan...</div>}
 
       {/* Summary */}
       {tab === 'summary' && data && !isLoading && (
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           <div className="stat-card">
-            <span className="text-xs font-medium text-slate-500 uppercase tracking-wide">Total Pembelian</span>
-            <p className="text-2xl font-display font-bold text-slate-800">{formatCurrency(data.purchaseTotal)}</p>
-            <p className="text-xs text-slate-400">{data.purchaseCount} transaksi PAID</p>
+            <span className="text-xs font-medium text-slate-500 dark:text-slate-500 uppercase tracking-wide">Total Pembelian</span>
+            <p className="text-2xl font-display font-bold text-slate-800 dark:text-slate-100">{formatCurrency(data.purchaseTotal)}</p>
+            <p className="text-xs text-slate-400 dark:text-slate-500">{data.purchaseCount} transaksi PAID</p>
           </div>
           <div className="stat-card">
-            <span className="text-xs font-medium text-slate-500 uppercase tracking-wide">Total Delivery</span>
-            <p className="text-2xl font-display font-bold text-slate-800">{formatCurrency(data.deliveryTotal)}</p>
-            <p className="text-xs text-slate-400">{data.deliveryCount} invoice PAID</p>
+            <span className="text-xs font-medium text-slate-500 dark:text-slate-500 uppercase tracking-wide">Total Delivery</span>
+            <p className="text-2xl font-display font-bold text-slate-800 dark:text-slate-100">{formatCurrency(data.deliveryTotal)}</p>
+            <p className="text-xs text-slate-400 dark:text-slate-500">{data.deliveryCount} invoice PAID</p>
           </div>
           <div className="stat-card">
-            <span className="text-xs font-medium text-slate-500 uppercase tracking-wide">Avg Pembelian</span>
-            <p className="text-2xl font-display font-bold text-slate-800">
+            <span className="text-xs font-medium text-slate-500 dark:text-slate-500 uppercase tracking-wide">Avg Pembelian</span>
+            <p className="text-2xl font-display font-bold text-slate-800 dark:text-slate-100">
               {data.purchaseCount > 0 ? formatCurrency(data.purchaseTotal / data.purchaseCount) : 'Rp 0'}
             </p>
-            <p className="text-xs text-slate-400">per transaksi</p>
+            <p className="text-xs text-slate-400 dark:text-slate-500">per transaksi</p>
           </div>
           <div className="stat-card">
-            <span className="text-xs font-medium text-slate-500 uppercase tracking-wide">Avg Delivery</span>
-            <p className="text-2xl font-display font-bold text-slate-800">
+            <span className="text-xs font-medium text-slate-500 dark:text-slate-500 uppercase tracking-wide">Avg Delivery</span>
+            <p className="text-2xl font-display font-bold text-slate-800 dark:text-slate-100">
               {data.deliveryCount > 0 ? formatCurrency(data.deliveryTotal / data.deliveryCount) : 'Rp 0'}
             </p>
-            <p className="text-xs text-slate-400">per invoice</p>
+            <p className="text-xs text-slate-400 dark:text-slate-500">per invoice</p>
           </div>
         </div>
       )}
@@ -98,7 +98,7 @@ export default function ReportsPage() {
       {tab === 'purchases' && Array.isArray(data) && !isLoading && (
         <div className="card overflow-hidden">
           <table className="w-full">
-            <thead className="bg-slate-50 border-b border-slate-100">
+            <thead className="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-800">
               <tr>
                 <th className="th">Invoice</th><th className="th">Tanggal</th>
                 <th className="th">Supplier</th><th className="th">Dibuat Oleh</th>
@@ -106,22 +106,22 @@ export default function ReportsPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50">
-              {data.length === 0 && <tr><td colSpan={6} className="td text-center py-8 text-slate-400">Tidak ada data</td></tr>}
+              {data.length === 0 && <tr><td colSpan={6} className="td text-center py-8 text-slate-400 dark:text-slate-500">Tidak ada data</td></tr>}
               {data.map((p: any) => (
-                <tr key={p.id} className="hover:bg-slate-50">
+                <tr key={p.id} className="hover:bg-slate-50 dark:bg-slate-800/50">
                   <td className="td font-mono text-xs">{p.invoiceNo}</td>
-                  <td className="td text-slate-500">{formatDate(p.date)}</td>
-                  <td className="td font-medium text-slate-700">{p.supplier.name}</td>
-                  <td className="td text-slate-500">{p.createdBy.name}</td>
+                  <td className="td text-slate-500 dark:text-slate-500">{formatDate(p.date)}</td>
+                  <td className="td font-medium text-slate-700 dark:text-slate-200">{p.supplier.name}</td>
+                  <td className="td text-slate-500 dark:text-slate-500">{p.createdBy.name}</td>
                   <td className="td text-right font-semibold">{formatCurrency(p.totalAmount)}</td>
                   <td className="td text-center"><span className={cn('badge', STATUS_P[p.status])}>{p.status}</span></td>
                 </tr>
               ))}
             </tbody>
             {data.length > 0 && (
-              <tfoot className="bg-slate-50 border-t border-slate-200">
+              <tfoot className="bg-slate-50 dark:bg-slate-800/50 border-t border-slate-200 dark:border-slate-700">
                 <tr>
-                  <td colSpan={4} className="td font-semibold text-slate-700">Total</td>
+                  <td colSpan={4} className="td font-semibold text-slate-700 dark:text-slate-200">Total</td>
                   <td className="td text-right font-bold text-brand-700">{formatCurrency(data.reduce((s: number, p: any) => s + p.totalAmount, 0))}</td>
                   <td />
                 </tr>
@@ -135,7 +135,7 @@ export default function ReportsPage() {
       {tab === 'deliveries' && Array.isArray(data) && !isLoading && (
         <div className="card overflow-hidden">
           <table className="w-full">
-            <thead className="bg-slate-50 border-b border-slate-100">
+            <thead className="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-800">
               <tr>
                 <th className="th">Invoice</th><th className="th">Tanggal</th>
                 <th className="th">Konveksi</th><th className="th text-right">Item</th>
@@ -143,22 +143,22 @@ export default function ReportsPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50">
-              {data.length === 0 && <tr><td colSpan={6} className="td text-center py-8 text-slate-400">Tidak ada data</td></tr>}
+              {data.length === 0 && <tr><td colSpan={6} className="td text-center py-8 text-slate-400 dark:text-slate-500">Tidak ada data</td></tr>}
               {data.map((d: any) => (
-                <tr key={d.id} className="hover:bg-slate-50">
+                <tr key={d.id} className="hover:bg-slate-50 dark:bg-slate-800/50">
                   <td className="td font-mono text-xs">{d.invoiceNo}</td>
-                  <td className="td text-slate-500">{formatDate(d.date)}</td>
-                  <td className="td font-medium text-slate-700">{d.createdBy.name}</td>
-                  <td className="td text-right text-slate-600">{d.items.length}</td>
+                  <td className="td text-slate-500 dark:text-slate-500">{formatDate(d.date)}</td>
+                  <td className="td font-medium text-slate-700 dark:text-slate-200">{d.createdBy.name}</td>
+                  <td className="td text-right text-slate-600 dark:text-slate-300">{d.items.length}</td>
                   <td className="td text-right font-semibold">{formatCurrency(d.totalAmount)}</td>
                   <td className="td text-center"><span className={cn('badge', STATUS_D[d.status])}>{d.status}</span></td>
                 </tr>
               ))}
             </tbody>
             {data.length > 0 && (
-              <tfoot className="bg-slate-50 border-t border-slate-200">
+              <tfoot className="bg-slate-50 dark:bg-slate-800/50 border-t border-slate-200 dark:border-slate-700">
                 <tr>
-                  <td colSpan={4} className="td font-semibold text-slate-700">Total</td>
+                  <td colSpan={4} className="td font-semibold text-slate-700 dark:text-slate-200">Total</td>
                   <td className="td text-right font-bold text-brand-700">{formatCurrency(data.reduce((s: number, d: any) => s + d.totalAmount, 0))}</td>
                   <td />
                 </tr>
@@ -172,7 +172,7 @@ export default function ReportsPage() {
       {tab === 'stock' && Array.isArray(data) && !isLoading && (
         <div className="card overflow-hidden">
           <table className="w-full">
-            <thead className="bg-slate-50 border-b border-slate-100">
+            <thead className="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-800">
               <tr>
                 <th className="th">SKU</th><th className="th">Nama</th><th className="th">Kategori</th>
                 <th className="th text-right">Stok</th><th className="th text-right">Min</th>
@@ -180,16 +180,16 @@ export default function ReportsPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50">
-              {data.length === 0 && <tr><td colSpan={6} className="td text-center py-8 text-slate-400">Tidak ada produk</td></tr>}
+              {data.length === 0 && <tr><td colSpan={6} className="td text-center py-8 text-slate-400 dark:text-slate-500">Tidak ada produk</td></tr>}
               {data.map((p: any) => {
                 const s = getStockStatus(p.currentStock, p.minStock)
                 return (
-                  <tr key={p.id} className="hover:bg-slate-50">
-                    <td className="td font-mono text-xs text-slate-500">{p.sku}</td>
-                    <td className="td font-medium text-slate-800">{p.name}</td>
-                    <td className="td text-slate-500">{p.category?.name ?? '-'}</td>
-                    <td className="td text-right font-semibold">{p.currentStock.toLocaleString('id-ID')} <span className="font-normal text-xs text-slate-400">{p.unit}</span></td>
-                    <td className="td text-right text-slate-400">{p.minStock}</td>
+                  <tr key={p.id} className="hover:bg-slate-50 dark:bg-slate-800/50">
+                    <td className="td font-mono text-xs text-slate-500 dark:text-slate-500">{p.sku}</td>
+                    <td className="td font-medium text-slate-800 dark:text-slate-100">{p.name}</td>
+                    <td className="td text-slate-500 dark:text-slate-500">{p.category?.name ?? '-'}</td>
+                    <td className="td text-right font-semibold">{p.currentStock.toLocaleString('id-ID')} <span className="font-normal text-xs text-slate-400 dark:text-slate-500">{p.unit}</span></td>
+                    <td className="td text-right text-slate-400 dark:text-slate-500">{p.minStock}</td>
                     <td className="td text-center"><span className={cn('badge', s.color)}>{s.label}</span></td>
                   </tr>
                 )

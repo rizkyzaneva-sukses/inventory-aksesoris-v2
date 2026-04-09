@@ -9,7 +9,7 @@ const STATUS_COLOR: Record<string, string> = {
   PENDING:   'bg-yellow-500/15 text-yellow-400',
   PAID:      'bg-brand-500/15 text-brand-400',
   UNPAID:    'bg-red-500/15 text-red-400',
-  CANCELLED: 'bg-slate-500/15 text-slate-400',
+  CANCELLED: 'bg-slate-500/15 text-slate-400 dark:text-slate-500',
 }
 
 export default function DashboardPage() {

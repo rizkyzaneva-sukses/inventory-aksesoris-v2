@@ -68,8 +68,8 @@ export default function WalletPage() {
     <div className="p-6 max-w-5xl mx-auto space-y-6">
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
-          <h1 className="text-2xl font-display font-bold text-slate-800">Saldo & Kas</h1>
-          <p className="text-slate-500 text-sm mt-1">Posisi saldo semua entitas & riwayat mutasi</p>
+          <h1 className="text-2xl font-display font-bold text-slate-800 dark:text-slate-100">Saldo & Kas</h1>
+          <p className="text-slate-500 dark:text-slate-500 text-sm mt-1">Posisi saldo semua entitas & riwayat mutasi</p>
         </div>
         {role === 'OWNER' && (
           <div className="flex gap-2">
@@ -93,9 +93,9 @@ export default function WalletPage() {
         {Object.entries(ENTITY_LABELS).map(([key, meta]) => (
           <button key={key} onClick={() => setFilterEntity(filterEntity === key ? '' : key)}
             className={cn('card p-5 text-left border-2 transition-colors hover:shadow-md',
-              filterEntity === key ? 'border-brand-400 shadow-md' : 'border-slate-200')}>
+              filterEntity === key ? 'border-brand-400 shadow-md' : 'border-slate-200 dark:border-slate-700')}>
             <div className="flex items-center justify-between mb-3">
-              <span className="text-xs font-semibold text-slate-500 uppercase tracking-wide">{meta.label}</span>
+              <span className="text-xs font-semibold text-slate-500 dark:text-slate-500 uppercase tracking-wide">{meta.label}</span>
               <div className={cn('w-8 h-8 rounded-lg flex items-center justify-center', meta.bg)}>
                 <Wallet size={15} className={meta.color} />
               </div>
@@ -103,7 +103,7 @@ export default function WalletPage() {
             <p className={cn('text-2xl font-display font-bold', meta.color)}>
               {isLoading ? '...' : formatCurrency(balances[key.toLowerCase()] ?? 0)}
             </p>
-            <p className="text-xs text-slate-400 mt-1">{filterEntity === key ? '▲ filter aktif' : 'klik untuk filter'}</p>
+            <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">{filterEntity === key ? '▲ filter aktif' : 'klik untuk filter'}</p>
           </button>
         ))}
       </div>
@@ -115,7 +115,7 @@ export default function WalletPage() {
             className={cn('px-4 py-1.5 rounded-full text-sm font-medium transition-colors border',
               filterEntity === key
                 ? 'bg-brand-600 text-white border-brand-600'
-                : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50')}>
+                : 'bg-[var(--bg-surface)] text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:bg-slate-800/50')}>
             {key === '' ? 'Semua' : ENTITY_LABELS[key]?.label}
           </button>
         ))}
@@ -123,14 +123,14 @@ export default function WalletPage() {
 
       {/* Ledger table */}
       <div className="card overflow-hidden">
-        <div className="px-5 py-4 border-b border-slate-100">
-          <h2 className="font-display font-semibold text-slate-800">
+        <div className="px-5 py-4 border-b border-slate-100 dark:border-slate-800">
+          <h2 className="font-display font-semibold text-slate-800 dark:text-slate-100">
             Riwayat Mutasi {filterEntity ? `— ${ENTITY_LABELS[filterEntity]?.label}` : '(Semua)'}
           </h2>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-slate-50 border-b border-slate-100">
+            <thead className="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-800">
               <tr>
                 <th className="th">Tanggal</th>
                 <th className="th">Entitas</th>
@@ -143,10 +143,10 @@ export default function WalletPage() {
             </thead>
             <tbody className="divide-y divide-slate-50">
               {isLoading && (
-                <tr><td colSpan={7} className="td text-center py-8 text-slate-400">Memuat...</td></tr>
+                <tr><td colSpan={7} className="td text-center py-8 text-slate-400 dark:text-slate-500">Memuat...</td></tr>
               )}
               {!isLoading && ledger.length === 0 && (
-                <tr><td colSpan={7} className="td text-center py-10 text-slate-400">
+                <tr><td colSpan={7} className="td text-center py-10 text-slate-400 dark:text-slate-500">
                   <Wallet size={28} className="mx-auto mb-2 text-slate-200" />
                   <p>Belum ada mutasi</p>
                 </td></tr>
@@ -155,17 +155,17 @@ export default function WalletPage() {
                 const meta = ENTITY_LABELS[l.entityType]
                 const isKredit = l.type === 'KREDIT'
                 return (
-                  <tr key={l.id} className="hover:bg-slate-50">
-                    <td className="td text-slate-500 whitespace-nowrap text-xs">{formatDate(l.createdAt)}</td>
+                  <tr key={l.id} className="hover:bg-slate-50 dark:bg-slate-800/50">
+                    <td className="td text-slate-500 dark:text-slate-500 whitespace-nowrap text-xs">{formatDate(l.createdAt)}</td>
                     <td className="td">
                       <span className={cn('badge', meta?.bg, meta?.color)}>{meta?.label}</span>
                     </td>
-                    <td className="td text-slate-700 max-w-xs">
+                    <td className="td text-slate-700 dark:text-slate-200 max-w-xs">
                       <p className="truncate text-sm">{l.description}</p>
-                      {l.topupBy && <p className="text-xs text-slate-400">oleh {l.topupBy.name}</p>}
+                      {l.topupBy && <p className="text-xs text-slate-400 dark:text-slate-500">oleh {l.topupBy.name}</p>}
                     </td>
                     <td className="td text-center">
-                      <span className="badge bg-slate-100 text-slate-600 text-xs">
+                      <span className="badge bg-slate-100 text-slate-600 dark:text-slate-300 text-xs">
                         {REF_LABELS[l.refType] ?? l.refType ?? '-'}
                       </span>
                     </td>
@@ -179,7 +179,7 @@ export default function WalletPage() {
                     <td className={cn('td text-right font-semibold', isKredit ? 'text-green-700' : 'text-red-600')}>
                       {isKredit ? '+' : '-'}{formatCurrency(l.amount)}
                     </td>
-                    <td className="td text-right font-semibold text-slate-800">
+                    <td className="td text-right font-semibold text-slate-800 dark:text-slate-100">
                       {formatCurrency(l.balanceAfter)}
                     </td>
                   </tr>
@@ -193,10 +193,10 @@ export default function WalletPage() {
       {/* Top-up Modal */}
       {topupModal && (
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md">
-            <div className="flex items-center justify-between p-5 border-b border-slate-100">
-              <h2 className="font-display font-semibold text-slate-800">Top-up Saldo</h2>
-              <button onClick={() => setTopupModal(false)} className="text-slate-400 hover:text-slate-600"><X size={18} /></button>
+          <div className="bg-[var(--bg-surface)] rounded-2xl shadow-2xl w-full max-w-md">
+            <div className="flex items-center justify-between p-5 border-b border-slate-100 dark:border-slate-800">
+              <h2 className="font-display font-semibold text-slate-800 dark:text-slate-100">Top-up Saldo</h2>
+              <button onClick={() => setTopupModal(false)} className="text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:text-slate-300"><X size={18} /></button>
             </div>
             <form onSubmit={e => { e.preventDefault(); topupMutation.mutate({ ...topupForm, amount: Number(topupForm.amount) }) }} className="p-5 space-y-4">
               <div>
@@ -213,7 +213,7 @@ export default function WalletPage() {
                 <input type="number" className="input" min={1} placeholder="0"
                   value={topupForm.amount}
                   onChange={e => setTopupForm({ ...topupForm, amount: e.target.value })} required />
-                {topupForm.amount && <p className="text-xs text-slate-400 mt-1">{formatCurrency(Number(topupForm.amount))}</p>}
+                {topupForm.amount && <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">{formatCurrency(Number(topupForm.amount))}</p>}
               </div>
               <div>
                 <label className="label">Keterangan</label>
@@ -235,10 +235,10 @@ export default function WalletPage() {
       {/* Transfer Modal */}
       {transferModal && (
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md">
-            <div className="flex items-center justify-between p-5 border-b border-slate-100">
-              <h2 className="font-display font-semibold text-slate-800">Transfer Saldo Antar Entitas</h2>
-              <button onClick={() => setTransferModal(false)} className="text-slate-400 hover:text-slate-600"><X size={18} /></button>
+          <div className="bg-[var(--bg-surface)] rounded-2xl shadow-2xl w-full max-w-md">
+            <div className="flex items-center justify-between p-5 border-b border-slate-100 dark:border-slate-800">
+              <h2 className="font-display font-semibold text-slate-800 dark:text-slate-100">Transfer Saldo Antar Entitas</h2>
+              <button onClick={() => setTransferModal(false)} className="text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:text-slate-300"><X size={18} /></button>
             </div>
             <form onSubmit={e => {
               e.preventDefault()
@@ -256,12 +256,12 @@ export default function WalletPage() {
                     <option value="GUDANG">Saldo Gudang</option>
                     <option value="KONVEKSI">Saldo Konveksi</option>
                   </select>
-                  <p className="text-xs text-slate-400 mt-1">
+                  <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">
                     Saldo: {formatCurrency(balances[transferForm.fromEntity.toLowerCase()] ?? 0)}
                   </p>
                 </div>
                 <div className="flex-shrink-0 mt-4">
-                  <ArrowLeftRight size={20} className="text-slate-400" />
+                  <ArrowLeftRight size={20} className="text-slate-400 dark:text-slate-500" />
                 </div>
                 <div className="flex-1">
                   <label className="label">Ke *</label>
@@ -271,7 +271,7 @@ export default function WalletPage() {
                     <option value="GUDANG">Saldo Gudang</option>
                     <option value="KONVEKSI">Saldo Konveksi</option>
                   </select>
-                  <p className="text-xs text-slate-400 mt-1">
+                  <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">
                     Saldo: {formatCurrency(balances[transferForm.toEntity.toLowerCase()] ?? 0)}
                   </p>
                 </div>
@@ -282,7 +282,7 @@ export default function WalletPage() {
                 <input type="number" className="input" min={1} placeholder="0"
                   value={transferForm.amount}
                   onChange={e => setTransferForm({ ...transferForm, amount: e.target.value })} required />
-                {transferForm.amount && <p className="text-xs text-slate-400 mt-1">{formatCurrency(Number(transferForm.amount))}</p>}
+                {transferForm.amount && <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">{formatCurrency(Number(transferForm.amount))}</p>}
               </div>
 
               <div>
@@ -294,7 +294,7 @@ export default function WalletPage() {
 
               {/* Preview */}
               {transferForm.amount && Number(transferForm.amount) > 0 && (
-                <div className="bg-slate-50 rounded-lg p-3 text-xs space-y-1 text-slate-600">
+                <div className="bg-slate-50 dark:bg-slate-800/50 rounded-lg p-3 text-xs space-y-1 text-slate-600 dark:text-slate-300">
                   <p>📤 {ENTITY_LABELS[transferForm.fromEntity]?.label}: <span className="text-red-600 font-semibold">-{formatCurrency(Number(transferForm.amount))}</span></p>
                   <p>📥 {ENTITY_LABELS[transferForm.toEntity]?.label}: <span className="text-green-600 font-semibold">+{formatCurrency(Number(transferForm.amount))}</span></p>
                 </div>

@@ -29,8 +29,8 @@ export default function DashboardPage() {
   return (
     <div className="p-6 max-w-7xl mx-auto space-y-6">
       <div>
-        <h1 className="text-2xl font-display font-bold text-slate-800">Dashboard</h1>
-        <p className="text-slate-500 text-sm mt-1">Selamat datang, <span className="font-medium text-slate-700">{session?.user?.name}</span></p>
+        <h1 className="text-2xl font-display font-bold text-slate-800 dark:text-slate-100">Dashboard</h1>
+        <p className="text-slate-500 dark:text-slate-500 text-sm mt-1">Selamat datang, <span className="font-medium text-slate-700 dark:text-slate-200">{session?.user?.name}</span></p>
       </div>
 
       {/* Alerts */}
@@ -60,66 +60,66 @@ export default function DashboardPage() {
         {['GUDANG', 'OWNER'].includes(role) && (
           <div className="stat-card">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-medium text-slate-500 uppercase tracking-wide">Total Produk</span>
+              <span className="text-xs font-medium text-slate-500 dark:text-slate-500 uppercase tracking-wide">Total Produk</span>
               <div className="w-8 h-8 bg-blue-50 rounded-lg flex items-center justify-center"><Package size={15} className="text-blue-600" /></div>
             </div>
-            <p className="text-2xl font-display font-bold text-slate-800">{data?.totalProducts ?? 0}</p>
-            <p className="text-xs text-slate-400">{data?.lowStock ?? 0} menipis</p>
+            <p className="text-2xl font-display font-bold text-slate-800 dark:text-slate-100">{data?.totalProducts ?? 0}</p>
+            <p className="text-xs text-slate-400 dark:text-slate-500">{data?.lowStock ?? 0} menipis</p>
           </div>
         )}
         {['FINANCE', 'OWNER'].includes(role) && (
           <>
             <div className="stat-card">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-medium text-slate-500 uppercase tracking-wide">Kas Finance</span>
+                <span className="text-xs font-medium text-slate-500 dark:text-slate-500 uppercase tracking-wide">Kas Finance</span>
                 <div className="w-8 h-8 bg-purple-50 rounded-lg flex items-center justify-center"><Wallet size={15} className="text-purple-600" /></div>
               </div>
-              <p className="text-xl font-display font-bold text-slate-800">{formatCurrency(data?.balances?.finance ?? 0)}</p>
-              <p className="text-xs text-slate-400">saldo tersedia</p>
+              <p className="text-xl font-display font-bold text-slate-800 dark:text-slate-100">{formatCurrency(data?.balances?.finance ?? 0)}</p>
+              <p className="text-xs text-slate-400 dark:text-slate-500">saldo tersedia</p>
             </div>
             <div className="stat-card">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-medium text-slate-500 uppercase tracking-wide">Saldo Gudang</span>
+                <span className="text-xs font-medium text-slate-500 dark:text-slate-500 uppercase tracking-wide">Saldo Gudang</span>
                 <div className="w-8 h-8 bg-green-50 rounded-lg flex items-center justify-center"><Wallet size={15} className="text-green-600" /></div>
               </div>
-              <p className="text-xl font-display font-bold text-slate-800">{formatCurrency(data?.balances?.gudang ?? 0)}</p>
-              <p className="text-xs text-slate-400">dari konveksi</p>
+              <p className="text-xl font-display font-bold text-slate-800 dark:text-slate-100">{formatCurrency(data?.balances?.gudang ?? 0)}</p>
+              <p className="text-xs text-slate-400 dark:text-slate-500">dari konveksi</p>
             </div>
             <div className="stat-card">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-medium text-slate-500 uppercase tracking-wide">Saldo Konveksi</span>
+                <span className="text-xs font-medium text-slate-500 dark:text-slate-500 uppercase tracking-wide">Saldo Konveksi</span>
                 <div className="w-8 h-8 bg-orange-50 rounded-lg flex items-center justify-center"><Wallet size={15} className="text-orange-600" /></div>
               </div>
-              <p className="text-xl font-display font-bold text-slate-800">{formatCurrency(data?.balances?.konveksi ?? 0)}</p>
-              <p className="text-xs text-slate-400">tersisa</p>
+              <p className="text-xl font-display font-bold text-slate-800 dark:text-slate-100">{formatCurrency(data?.balances?.konveksi ?? 0)}</p>
+              <p className="text-xs text-slate-400 dark:text-slate-500">tersisa</p>
             </div>
           </>
         )}
         {role === 'KONVEKSI' && (
           <div className="stat-card col-span-2">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-medium text-slate-500 uppercase tracking-wide">Saldo Saya</span>
+              <span className="text-xs font-medium text-slate-500 dark:text-slate-500 uppercase tracking-wide">Saldo Saya</span>
               <div className="w-8 h-8 bg-orange-50 rounded-lg flex items-center justify-center"><Wallet size={15} className="text-orange-600" /></div>
             </div>
-            <p className="text-2xl font-display font-bold text-slate-800">{formatCurrency(data?.balances?.konveksi ?? 0)}</p>
-            <p className="text-xs text-slate-400">saldo tersisa</p>
+            <p className="text-2xl font-display font-bold text-slate-800 dark:text-slate-100">{formatCurrency(data?.balances?.konveksi ?? 0)}</p>
+            <p className="text-xs text-slate-400 dark:text-slate-500">saldo tersisa</p>
           </div>
         )}
         <div className="stat-card">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-slate-500 uppercase tracking-wide">Purchase Pending</span>
+            <span className="text-xs font-medium text-slate-500 dark:text-slate-500 uppercase tracking-wide">Purchase Pending</span>
             <div className="w-8 h-8 bg-yellow-50 rounded-lg flex items-center justify-center"><ShoppingCart size={15} className="text-yellow-600" /></div>
           </div>
-          <p className="text-2xl font-display font-bold text-slate-800">{data?.pendingPurchases ?? 0}</p>
-          <p className="text-xs text-slate-400">menunggu bayar</p>
+          <p className="text-2xl font-display font-bold text-slate-800 dark:text-slate-100">{data?.pendingPurchases ?? 0}</p>
+          <p className="text-xs text-slate-400 dark:text-slate-500">menunggu bayar</p>
         </div>
         <div className="stat-card">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-slate-500 uppercase tracking-wide">Invoice Unpaid</span>
+            <span className="text-xs font-medium text-slate-500 dark:text-slate-500 uppercase tracking-wide">Invoice Unpaid</span>
             <div className="w-8 h-8 bg-red-50 rounded-lg flex items-center justify-center"><Truck size={15} className="text-red-500" /></div>
           </div>
-          <p className="text-2xl font-display font-bold text-slate-800">{data?.unpaidInvoices ?? 0}</p>
-          <p className="text-xs text-slate-400">belum dibayar</p>
+          <p className="text-2xl font-display font-bold text-slate-800 dark:text-slate-100">{data?.unpaidInvoices ?? 0}</p>
+          <p className="text-xs text-slate-400 dark:text-slate-500">belum dibayar</p>
         </div>
       </div>
 
@@ -127,14 +127,14 @@ export default function DashboardPage() {
       <div className="grid lg:grid-cols-2 gap-6">
         {['GUDANG', 'FINANCE', 'OWNER'].includes(role) && (
           <div className="card">
-            <div className="p-5 border-b border-slate-100"><h2 className="font-display font-semibold text-slate-800">Purchase Request Terbaru</h2></div>
+            <div className="p-5 border-b border-slate-100 dark:border-slate-800"><h2 className="font-display font-semibold text-slate-800 dark:text-slate-100">Purchase Request Terbaru</h2></div>
             <div className="divide-y divide-slate-50">
-              {data?.recentPurchases?.length === 0 && <p className="p-5 text-sm text-slate-400 text-center">Belum ada data</p>}
+              {data?.recentPurchases?.length === 0 && <p className="p-5 text-sm text-slate-400 dark:text-slate-500 text-center">Belum ada data</p>}
               {data?.recentPurchases?.map((p: any) => (
                 <div key={p.id} className="px-5 py-3 flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-slate-700">{p.invoiceNo}</p>
-                    <p className="text-xs text-slate-400">{p.supplier.name} · {formatDate(p.date)}</p>
+                    <p className="text-sm font-medium text-slate-700 dark:text-slate-200">{p.invoiceNo}</p>
+                    <p className="text-xs text-slate-400 dark:text-slate-500">{p.supplier.name} · {formatDate(p.date)}</p>
                   </div>
                   <div className="text-right">
                     <p className="text-sm font-semibold">{formatCurrency(p.totalAmount)}</p>
@@ -146,14 +146,14 @@ export default function DashboardPage() {
           </div>
         )}
         <div className="card">
-          <div className="p-5 border-b border-slate-100"><h2 className="font-display font-semibold text-slate-800">Delivery Terbaru</h2></div>
+          <div className="p-5 border-b border-slate-100 dark:border-slate-800"><h2 className="font-display font-semibold text-slate-800 dark:text-slate-100">Delivery Terbaru</h2></div>
           <div className="divide-y divide-slate-50">
-            {data?.recentDeliveries?.length === 0 && <p className="p-5 text-sm text-slate-400 text-center">Belum ada data</p>}
+            {data?.recentDeliveries?.length === 0 && <p className="p-5 text-sm text-slate-400 dark:text-slate-500 text-center">Belum ada data</p>}
             {data?.recentDeliveries?.map((d: any) => (
               <div key={d.id} className="px-5 py-3 flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-slate-700">{d.invoiceNo}</p>
-                  <p className="text-xs text-slate-400">{d.createdBy.name} · {formatDate(d.date)}</p>
+                  <p className="text-sm font-medium text-slate-700 dark:text-slate-200">{d.invoiceNo}</p>
+                  <p className="text-xs text-slate-400 dark:text-slate-500">{d.createdBy.name} · {formatDate(d.date)}</p>
                 </div>
                 <div className="text-right">
                   <p className="text-sm font-semibold">{formatCurrency(d.totalAmount)}</p>
