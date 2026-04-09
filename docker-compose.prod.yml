@@ -35,7 +35,7 @@ services:
     environment:
       DATABASE_URL: "postgres://inventaksesoris1:inventaksesoris123@fix-invent-db:5432/fix-invent-db?sslmode=disable"
       NEXTAUTH_SECRET: "inventory-production-secret-2026-bismillah"
-      NEXTAUTH_URL: "https://YOUR_DOMAIN.com"
+      NEXTAUTH_URL: "https://automasi-fix-invent-acc-konveksi9uq3fk.easypanel.host"
     depends_on:
       fix-invent-db:
         condition: service_healthy

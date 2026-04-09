@@ -9,11 +9,11 @@ async function main() {
 
   const pw = await bcrypt.hash('password123', 10)
 
-  // Users
-  await prisma.user.upsert({ where: { email: 'gudang@inventory.com' }, update: {}, create: { name: 'Gudang', email: 'gudang@inventory.com', password: pw, role: 'GUDANG' } })
-  await prisma.user.upsert({ where: { email: 'finance@inventory.com' }, update: {}, create: { name: 'Finance', email: 'finance@inventory.com', password: pw, role: 'FINANCE' } })
-  await prisma.user.upsert({ where: { email: 'konveksi@inventory.com' }, update: {}, create: { name: 'Konveksi Maju', email: 'konveksi@inventory.com', password: pw, role: 'KONVEKSI' } })
-  await prisma.user.upsert({ where: { email: 'owner@inventory.com' }, update: {}, create: { name: 'Owner', email: 'owner@inventory.com', password: pw, role: 'OWNER' } })
+  // Users - selalu update password agar login selalu bisa
+  await prisma.user.upsert({ where: { email: 'gudang@inventory.com' },   update: { password: pw, isActive: true }, create: { name: 'Gudang',        email: 'gudang@inventory.com',   password: pw, role: 'GUDANG'   } })
+  await prisma.user.upsert({ where: { email: 'finance@inventory.com' },  update: { password: pw, isActive: true }, create: { name: 'Finance',       email: 'finance@inventory.com',  password: pw, role: 'FINANCE'  } })
+  await prisma.user.upsert({ where: { email: 'konveksi@inventory.com' }, update: { password: pw, isActive: true }, create: { name: 'Konveksi Maju', email: 'konveksi@inventory.com', password: pw, role: 'KONVEKSI' } })
+  await prisma.user.upsert({ where: { email: 'owner@inventory.com' },    update: { password: pw, isActive: true }, create: { name: 'Owner',         email: 'owner@inventory.com',    password: pw, role: 'OWNER'   } })
 
   // Categories
   const cats = await Promise.all([
