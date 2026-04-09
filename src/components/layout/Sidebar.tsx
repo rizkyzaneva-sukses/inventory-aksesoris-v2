@@ -5,7 +5,7 @@ import { useSession, signOut } from 'next-auth/react'
 import { useTheme } from 'next-themes'
 import {
   LayoutDashboard, Package, ShoppingCart, Truck, FileText,
-  BarChart2, Users, Wallet, LogOut, Package2, Shield,
+  BarChart2, Users, Wallet, LogOut, Package2, Shield, HelpCircle,
   Sun, Moon, Menu, X
 } from 'lucide-react'
 import { cn, getRoleBadge } from '@/lib/utils'
@@ -21,6 +21,7 @@ const NAV = [
   { href: '/dashboard/reports',    label: 'Laporan',          icon: BarChart2,       roles: ['OWNER','FINANCE'] },
   { href: '/dashboard/users',      label: 'Manajemen User',   icon: Users,           roles: ['OWNER'] },
   { href: '/dashboard/audit',      label: 'Audit Log',        icon: Shield,          roles: ['OWNER'] },
+  { href: '/dashboard/guide',      label: 'Panduan',          icon: HelpCircle,      roles: ['GUDANG','FINANCE','KONVEKSI','OWNER'] },
 ]
 
 function ThemeToggle() {
