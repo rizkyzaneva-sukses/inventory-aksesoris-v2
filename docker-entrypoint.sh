@@ -27,19 +27,44 @@ done
 
 echo "✅ Database is reachable!"
 
-# Sync schema with Prisma
+# Sync schema with Prisma - coba beberapa cara
 echo "📦 Syncing database schema..."
-npx prisma db push --skip-generate --accept-data-loss 2>&1 || {
-  echo "⚠️ prisma db push failed, trying again in 5s..."
-  sleep 5
-  npx prisma db push --skip-generate --accept-data-loss 2>&1 || echo "⚠️ Schema sync failed - app may still work if schema exists"
-}
+SCHEMA_PUSHED=false
 
-echo "✅ Database schema synced!"
+# Cara 1: npx prisma
+if [ "$SCHEMA_PUSHED" = "false" ]; then
+  echo "Mencoba: npx prisma db push..."
+  npx prisma db push --skip-generate --accept-data-loss 2>&1 && SCHEMA_PUSHED=true || echo "⚠️ npx prisma gagal"
+fi
+
+# Cara 2: node_modules/.bin/prisma
+if [ "$SCHEMA_PUSHED" = "false" ]; then
+  echo "Mencoba: ./node_modules/.bin/prisma db push..."
+  ./node_modules/.bin/prisma db push --skip-generate --accept-data-loss 2>&1 && SCHEMA_PUSHED=true || echo "⚠️ ./node_modules/.bin/prisma gagal"
+fi
+
+# Cara 3: node modules/prisma/build
+if [ "$SCHEMA_PUSHED" = "false" ]; then
+  echo "Mencoba: node ./node_modules/prisma/build/index.js db push..."
+  node ./node_modules/prisma/build/index.js db push --skip-generate --accept-data-loss 2>&1 && SCHEMA_PUSHED=true || echo "⚠️ node prisma/build gagal"
+fi
+
+# Cara 4: retry npx setelah delay
+if [ "$SCHEMA_PUSHED" = "false" ]; then
+  echo "⏳ Retry setelah 5 detik..."
+  sleep 5
+  npx prisma db push --skip-generate --accept-data-loss 2>&1 && SCHEMA_PUSHED=true || echo "⚠️ Schema sync gagal - gunakan /api/setup endpoint"
+fi
+
+if [ "$SCHEMA_PUSHED" = "true" ]; then
+  echo "✅ Database schema synced!"
+else
+  echo "⚠️ Schema push gagal semua - akses /api/setup?secret=setup-zaneva-2024 untuk setup manual"
+fi
 
 # Run seed (safe with upserts)
 echo "🌱 Running seed..."
-node prisma/seed.js || echo "⚠️ Seed skipped or already done"
+node prisma/seed.js 2>&1 || echo "⚠️ Seed skipped atau gagal - gunakan /api/setup endpoint"
 
 echo "✅ App ready! Starting server..."
 exec node server.js
