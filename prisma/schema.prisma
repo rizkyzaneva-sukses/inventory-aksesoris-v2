@@ -1,0 +1,224 @@
+// prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  GUDANG
+  FINANCE
+  KONVEKSI
+  OWNER
+}
+
+enum PurchaseStatus {
+  PENDING
+  PAID
+  CANCELLED
+}
+
+enum DeliveryStatus {
+  UNPAID
+  PAID
+  CANCELLED
+}
+
+enum WalletEntityType {
+  FINANCE
+  GUDANG
+  KONVEKSI
+}
+
+enum WalletType {
+  KREDIT
+  DEBIT
+}
+
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  password  String
+  role      Role
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  purchases  PurchaseRequest[]
+  deliveries DeliveryRequest[]
+  auditLogs  AuditLog[]
+  walletTopups WalletLedger[] @relation("TopupBy")
+
+  @@map("users")
+}
+
+model Category {
+  id        String    @id @default(cuid())
+  name      String    @unique
+  createdAt DateTime  @default(now())
+  products  Product[]
+
+  @@map("categories")
+}
+
+model Supplier {
+  id        String            @id @default(cuid())
+  name      String
+  phone     String?
+  address   String?
+  notes     String?
+  isActive  Boolean           @default(true)
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
+  purchases PurchaseRequest[]
+
+  @@map("suppliers")
+}
+
+model Product {
+  id           String   @id @default(cuid())
+  sku          String   @unique
+  name         String
+  description  String?
+  unit         String   @default("pcs")
+  minStock     Int      @default(10)
+  currentStock Int      @default(0)
+  isActive     Boolean  @default(true)
+  categoryId   String?
+  category     Category? @relation(fields: [categoryId], references: [id])
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  purchaseItems  PurchaseItem[]
+  deliveryItems  DeliveryItem[]
+  stockHistory   StockHistory[]
+
+  @@map("products")
+}
+
+// ─── ALUR 1: Gudang beli ke Supplier ───────────────────────────
+
+model PurchaseRequest {
+  id          String          @id @default(cuid())
+  invoiceNo   String          @unique
+  date        DateTime        @default(now())
+  supplierId  String
+  supplier    Supplier        @relation(fields: [supplierId], references: [id])
+  createdById String
+  createdBy   User            @relation(fields: [createdById], references: [id])
+  status      PurchaseStatus  @default(PENDING)
+  notes       String?
+  totalAmount Float           @default(0)
+  paidAt      DateTime?
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  items       PurchaseItem[]
+  
+
+  @@map("purchase_requests")
+}
+
+model PurchaseItem {
+  id            String          @id @default(cuid())
+  purchaseId    String
+  purchase      PurchaseRequest @relation(fields: [purchaseId], references: [id], onDelete: Cascade)
+  productId     String
+  product       Product         @relation(fields: [productId], references: [id])
+  qty           Int
+  unit          String
+  pricePerUnit  Float
+  totalPrice    Float
+
+  @@map("purchase_items")
+}
+
+// ─── ALUR 2: Konveksi ambil aksesoris dari Gudang ──────────────
+
+model DeliveryRequest {
+  id          String         @id @default(cuid())
+  invoiceNo   String         @unique
+  date        DateTime       @default(now())
+  createdById String
+  createdBy   User           @relation(fields: [createdById], references: [id])
+  status      DeliveryStatus @default(UNPAID)
+  notes       String?
+  totalAmount Float          @default(0)
+  paidAt      DateTime?
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  items       DeliveryItem[]
+  
+
+  @@map("delivery_requests")
+}
+
+model DeliveryItem {
+  id           String          @id @default(cuid())
+  deliveryId   String
+  delivery     DeliveryRequest @relation(fields: [deliveryId], references: [id], onDelete: Cascade)
+  productId    String
+  product      Product         @relation(fields: [productId], references: [id])
+  qty          Int
+  unit         String
+  pricePerUnit Float           // harga beli terakhir dari supplier
+  totalPrice   Float
+
+  @@map("delivery_items")
+}
+
+// ─── SALDO / WALLET ────────────────────────────────────────────
+
+model WalletLedger {
+  id           String           @id @default(cuid())
+  entityType   WalletEntityType // FINANCE / GUDANG / KONVEKSI
+  type         WalletType       // KREDIT (masuk) / DEBIT (keluar)
+  amount       Float
+  balanceAfter Float
+  description  String
+  refType      String?          // PURCHASE / DELIVERY / TOPUP
+  refId        String?
+  topupById    String?
+  topupBy      User?            @relation("TopupBy", fields: [topupById], references: [id])
+  createdAt    DateTime         @default(now())
+
+  @@map("wallet_ledger")
+}
+
+// ─── STOCK HISTORY ─────────────────────────────────────────────
+
+model StockHistory {
+  id         String   @id @default(cuid())
+  productId  String
+  product    Product  @relation(fields: [productId], references: [id])
+  type       String   // IN / OUT
+  qty        Int
+  stockAfter Int
+  refType    String?  // Purchase / Delivery
+  refId      String?
+  notes      String?
+  createdAt  DateTime @default(now())
+
+  @@map("stock_history")
+}
+
+// ─── AUDIT LOG ─────────────────────────────────────────────────
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  action    String
+  entity    String
+  entityId  String?
+  detail    String?
+  createdAt DateTime @default(now())
+
+  @@map("audit_logs")
+}
