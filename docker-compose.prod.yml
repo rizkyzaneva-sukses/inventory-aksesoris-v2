@@ -27,7 +27,7 @@ services:
 
   # ─── Next.js App (from GHCR) ─────────────────────────────────
   app:
-    image: ${APP_IMAGE:-ghcr.io/GITHUB_USER/REPO_NAME:latest}
+    image: ${APP_IMAGE:-ghcr.io/rizkyzaneva-sukses/inventory-aksesoris-v2:latest}
     container_name: automasi_inventory-app
     restart: always
     ports:
