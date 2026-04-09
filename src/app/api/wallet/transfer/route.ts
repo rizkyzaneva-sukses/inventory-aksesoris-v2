@@ -3,8 +3,9 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { audit } from '@/lib/audit'
+import { WalletEntityType } from '@prisma/client'
 
-async function getBalance(entityType: string) {
+async function getBalance(entityType: WalletEntityType) {
   const last = await prisma.walletLedger.findFirst({
     where: { entityType },
     orderBy: { createdAt: 'desc' },
