@@ -27,39 +27,33 @@ done
 
 echo "✅ Database is reachable!"
 
-# Sync schema with Prisma - coba beberapa cara
+# Sync schema with Prisma via node_modules (no global install)
 echo "📦 Syncing database schema..."
 SCHEMA_PUSHED=false
 
-# Cara 1: prisma global (installed via npm install -g prisma)
-if [ "$SCHEMA_PUSHED" = "false" ]; then
-  echo "Mencoba: prisma db push (global)..."
-  prisma db push --accept-data-loss 2>&1 && SCHEMA_PUSHED=true || echo "⚠️ prisma global gagal"
-fi
-
-# Cara 2: npx prisma
-if [ "$SCHEMA_PUSHED" = "false" ]; then
-  echo "Mencoba: npx prisma db push..."
-  npx prisma db push --accept-data-loss 2>&1 && SCHEMA_PUSHED=true || echo "⚠️ npx prisma gagal"
-fi
-
-# Cara 3: node modules/prisma/build
+# Cara 1: node modules/prisma/build (paling reliable di standalone)
 if [ "$SCHEMA_PUSHED" = "false" ]; then
   echo "Mencoba: node ./node_modules/prisma/build/index.js db push..."
   node ./node_modules/prisma/build/index.js db push --accept-data-loss 2>&1 && SCHEMA_PUSHED=true || echo "⚠️ node prisma/build gagal"
 fi
 
-# Cara 4: retry prisma global setelah delay
+# Cara 2: npx prisma (kalau tersedia)
+if [ "$SCHEMA_PUSHED" = "false" ]; then
+  echo "Mencoba: npx prisma db push..."
+  npx prisma db push --accept-data-loss 2>&1 && SCHEMA_PUSHED=true || echo "⚠️ npx prisma gagal"
+fi
+
+# Cara 3: retry setelah delay
 if [ "$SCHEMA_PUSHED" = "false" ]; then
   echo "⏳ Retry setelah 5 detik..."
   sleep 5
-  prisma db push --accept-data-loss 2>&1 && SCHEMA_PUSHED=true || echo "⚠️ Schema sync gagal - gunakan /api/setup endpoint"
+  node ./node_modules/prisma/build/index.js db push --accept-data-loss 2>&1 && SCHEMA_PUSHED=true || echo "⚠️ Schema sync gagal - gunakan /api/setup endpoint"
 fi
 
 if [ "$SCHEMA_PUSHED" = "true" ]; then
   echo "✅ Database schema synced!"
 else
-  echo "⚠️ Schema push gagal semua - akses /api/setup?secret=setup-zaneva-2024 untuk setup manual"
+  echo "⚠️ Schema push gagal - app tetap berjalan, akses /api/setup?secret=setup-zaneva-2024 untuk setup manual"
 fi
 
 # Run seed (safe with upserts)

@@ -15,9 +15,8 @@ export async function GET(request: Request) {
   // Step 1: Push database schema - coba beberapa cara
   let schemaPushed = false
   const prismaCmds = [
-    'prisma db push --accept-data-loss',
-    'npx prisma db push --accept-data-loss',
     'node ./node_modules/prisma/build/index.js db push --accept-data-loss',
+    'npx prisma db push --accept-data-loss',
   ]
 
   for (const cmd of prismaCmds) {
