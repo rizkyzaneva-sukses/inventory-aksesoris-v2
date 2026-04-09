@@ -4,7 +4,7 @@ import axios from 'axios'
 import { useSession } from 'next-auth/react'
 import toast from 'react-hot-toast'
 import { formatCurrency, formatDate, cn } from '@/lib/utils'
-import { FileText, CheckCircle } from 'lucide-react'
+import { FileText, CheckCircle, XCircle } from 'lucide-react'
 
 const STATUS_COLOR: Record<string, string> = {
   UNPAID: 'bg-red-50 text-red-700',
@@ -30,8 +30,23 @@ export default function InvoicesPage() {
       qc.invalidateQueries({ queryKey: ['wallet'] })
       qc.invalidateQueries({ queryKey: ['dashboard'] })
     },
-    onError: (e: any) => toast.error(e.response?.data?.error ?? 'Gagal'),
+    onError: (e: any) => toast.error(e.response?.data?.error ?? 'Gagal PAY'),
   })
+
+  const declineMutation = useMutation({
+    mutationFn: ({ id, reason }: { id: string, reason: string }) => axios.patch(`/api/deliveries/${id}`, { action: 'DECLINE', reason }),
+    onSuccess: () => {
+      toast.success('Berhasil ditolak')
+      qc.invalidateQueries({ queryKey: ['deliveries'] })
+      qc.invalidateQueries({ queryKey: ['dashboard'] })
+    },
+    onError: (e: any) => toast.error(e.response?.data?.error ?? 'Gagal Decline'),
+  })
+
+  function handleDecline(id: string) {
+    const reason = prompt('Masukkan alasan decline:')
+    if (reason !== null) declineMutation.mutate({ id, reason })
+  }
 
   const unpaidTotal = deliveries?.filter((d: any) => d.status === 'UNPAID').reduce((s: number, d: any) => s + d.totalAmount, 0) ?? 0
 
@@ -75,14 +90,24 @@ export default function InvoicesPage() {
                   <p className="text-xs text-slate-400 dark:text-slate-500">Total</p>
                   <p className="text-xl font-display font-bold text-slate-800 dark:text-slate-100">{formatCurrency(d.totalAmount)}</p>
                 </div>
-                {d.status === 'UNPAID' && ['FINANCE', 'OWNER'].includes(role) && (
-                  <button
-                    onClick={() => { if (confirm(`PAY invoice ${d.invoiceNo}?\nSaldo Konveksi berkurang: ${formatCurrency(d.totalAmount)}\nSaldo Gudang bertambah: ${formatCurrency(d.totalAmount)}`)) payMutation.mutate(d.id) }}
-                    disabled={payMutation.isPending}
-                    className="btn-pay">
-                    <CheckCircle size={16} /> PAY
-                  </button>
-                )}
+                <div className="flex gap-2">
+                  {d.status === 'UNPAID' && ['FINANCE', 'OWNER'].includes(role) && (
+                    <>
+                      <button
+                        onClick={() => { if (confirm(`PAY invoice ${d.invoiceNo}?`)) payMutation.mutate(d.id) }}
+                        disabled={payMutation.isPending}
+                        className="text-emerald-500 hover:text-emerald-600 transition-colors" title="PAY">
+                        <CheckCircle size={18} />
+                      </button>
+                      <button
+                        onClick={() => handleDecline(d.id)}
+                        disabled={declineMutation.isPending}
+                        className="text-red-500 hover:text-red-600 transition-colors" title="Decline">
+                        <XCircle size={18} />
+                      </button>
+                    </>
+                  )}
+                </div>
                 {d.status === 'PAID' && d.paidAt && (
                   <p className="text-xs text-slate-400 dark:text-slate-500">Dibayar {formatDate(d.paidAt)}</p>
                 )}

@@ -17,6 +17,17 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
   if (!purchase) return NextResponse.json({ error: 'Tidak ditemukan' }, { status: 404 })
   if (purchase.status !== 'PENDING') return NextResponse.json({ error: 'Sudah diproses' }, { status: 400 })
 
+  const body = await req.json().catch(() => ({}));
+
+  if (body.action === 'DECLINE') {
+    await prisma.purchaseRequest.update({
+      where: { id: params.id },
+      data: { status: 'CANCELLED', notes: body.reason ? `Alasan decline: ${body.reason}` : undefined }
+    })
+    await audit(userId, 'DECLINE_PURCHASE', 'PurchaseRequest', params.id)
+    return NextResponse.json({ success: true })
+  }
+
   // Get current Finance balance
   const lastFinance = await prisma.walletLedger.findFirst({ where: { entityType: 'FINANCE' }, orderBy: { createdAt: 'desc' } })
   const financeBalance = lastFinance?.balanceAfter ?? 0
@@ -61,5 +72,51 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
   })
 
   await audit(userId, 'PAY_PURCHASE', 'PurchaseRequest', purchase.id)
+  return NextResponse.json({ success: true })
+}
+
+export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
+  const session = await getServerSession(authOptions)
+  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const role = (session.user as any).role
+  const userId = (session.user as any).id
+  if (!['GUDANG', 'OWNER'].includes(role)) return NextResponse.json({ error: 'Akses ditolak' }, { status: 403 })
+
+  const purchase = await prisma.purchaseRequest.findUnique({ where: { id: params.id } })
+  if (!purchase) return NextResponse.json({ error: 'Tidak ditemukan' }, { status: 404 })
+  if (purchase.status !== 'PENDING') return NextResponse.json({ error: 'Hanya bisa diedit saat PENDING' }, { status: 400 })
+
+  const body = await req.json()
+  const { supplierId, notes, date, items } = body
+
+  // Calculate new total
+  let totalAmount = 0
+  for (const item of items) {
+    totalAmount += Number(item.qty) * Number(item.pricePerUnit)
+  }
+
+  await prisma.$transaction(async (tx) => {
+    // Delete old items
+    await tx.purchaseItem.deleteMany({ where: { purchaseId: params.id } })
+    
+    // Update purchase data
+    await tx.purchaseRequest.update({
+      where: { id: params.id },
+      data: {
+        supplierId, notes, date: new Date(date), totalAmount,
+        items: {
+          create: items.map((i: any) => ({
+            productId: i.productId,
+            qty: Number(i.qty),
+            unit: i.unit,
+            pricePerUnit: Number(i.pricePerUnit),
+            totalPrice: Number(i.qty) * Number(i.pricePerUnit)
+          }))
+        }
+      }
+    })
+  })
+
+  await audit(userId, 'EDIT_PURCHASE', 'PurchaseRequest', params.id)
   return NextResponse.json({ success: true })
 }

@@ -4,7 +4,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import axios from 'axios'
 import { useSession } from 'next-auth/react'
 import toast from 'react-hot-toast'
-import { Plus, X, Loader2, Trash2, ShoppingCart, CheckCircle } from 'lucide-react'
+import { Plus, X, Loader2, Trash2, ShoppingCart, CheckCircle, XCircle, Pencil } from 'lucide-react'
 import { formatCurrency, formatDate, cn } from '@/lib/utils'
 
 const STATUS_COLOR: Record<string, string> = {
@@ -18,6 +18,7 @@ export default function PurchasesPage() {
   const role = (session?.user as any)?.role
   const qc = useQueryClient()
   const [modal, setModal] = useState(false)
+  const [editId, setEditId] = useState<string | null>(null)
   const [form, setForm] = useState({ supplierId: '', notes: '', date: new Date().toISOString().split('T')[0] })
   const [items, setItems] = useState<any[]>([])
 
@@ -37,6 +38,32 @@ export default function PurchasesPage() {
     onError: (e: any) => toast.error(e.response?.data?.error ?? 'Gagal PAY'),
   })
 
+  const declineMutation = useMutation({
+    mutationFn: ({ id, reason }: { id: string, reason: string }) => axios.patch(`/api/purchases/${id}`, { action: 'DECLINE', reason }),
+    onSuccess: () => { toast.success('Berhasil ditolak'); qc.invalidateQueries({ queryKey: ['purchases'] }); qc.invalidateQueries({ queryKey: ['dashboard'] }) },
+    onError: (e: any) => toast.error(e.response?.data?.error ?? 'Gagal Decline'),
+  })
+
+  const updateMutation = useMutation({
+    mutationFn: (d: any) => axios.put(`/api/purchases/${editId}`, d),
+    onSuccess: () => { toast.success('Purchase Request diupdate'); qc.invalidateQueries({ queryKey: ['purchases'] }); qc.invalidateQueries({ queryKey: ['dashboard'] }); setModal(false); setEditId(null); setItems([]) },
+    onError: (e: any) => toast.error(e.response?.data?.error ?? 'Gagal Update'),
+  })
+
+  function openEdit(p: any) {
+    setEditId(p.id)
+    setForm({ supplierId: p.supplierId, notes: p.notes ?? '', date: new Date(p.date).toISOString().split('T')[0] })
+    setItems(p.items.map((i: any) => ({ ...i, qty: String(i.qty), pricePerUnit: String(i.pricePerUnit) })))
+    setModal(true)
+  }
+
+  function handleDecline(id: string) {
+    const reason = prompt('Masukkan alasan decline:')
+    if (reason !== null) {
+      declineMutation.mutate({ id, reason })
+    }
+  }
+
   function addItem() { setItems([...items, { productId: '', qty: '1', unit: 'pcs', pricePerUnit: '0' }]) }
   function removeItem(i: number) { setItems(items.filter((_, idx) => idx !== i)) }
   function updateItem(i: number, field: string, val: string) {
@@ -54,7 +81,7 @@ export default function PurchasesPage() {
           <h1 className="text-2xl font-display font-bold text-slate-800 dark:text-slate-100">Purchase Request</h1>
           <p className="text-slate-500 dark:text-slate-500 text-sm mt-1">Permintaan pembelian aksesoris ke supplier</p>
         </div>
-        {['GUDANG', 'OWNER'].includes(role) && <button onClick={() => setModal(true)} className="btn-primary"><Plus size={16} /> Buat PR</button>}
+        {['GUDANG', 'OWNER'].includes(role) && <button onClick={() => { setEditId(null); setForm({ supplierId: '', notes: '', date: new Date().toISOString().split('T')[0] }); setItems([]); setModal(true) }} className="btn-primary"><Plus size={16} /> Buat PR</button>}
       </div>
 
       <div className="card overflow-hidden">
@@ -82,14 +109,25 @@ export default function PurchasesPage() {
                 <td className="td text-right font-semibold">{formatCurrency(p.totalAmount)}</td>
                 <td className="td text-center"><span className={cn('badge', STATUS_COLOR[p.status])}>{p.status}</span></td>
                 <td className="td text-center">
-                  {p.status === 'PENDING' && ['FINANCE', 'OWNER'].includes(role) && (
-                    <button onClick={() => { if (confirm(`PAY ${p.invoiceNo} sebesar ${formatCurrency(p.totalAmount)}?`)) payMutation.mutate(p.id) }}
-                      disabled={payMutation.isPending}
-                      className="btn-pay text-xs py-1 px-3">
-                      <CheckCircle size={13} /> PAY
-                    </button>
-                  )}
+                  <div className="flex items-center justify-center gap-2">
+                    {p.status === 'PENDING' && ['FINANCE', 'OWNER'].includes(role) && (
+                      <button onClick={() => { if (confirm(`PAY invoice ini?`)) payMutation.mutate(p.id) }} disabled={payMutation.isPending} className="text-emerald-500 hover:text-emerald-600 transition-colors" title="PAY">
+                        <CheckCircle size={18} />
+                      </button>
+                    )}
+                    {p.status === 'PENDING' && ['GUDANG', 'OWNER'].includes(role) && (
+                      <button onClick={() => openEdit(p)} className="text-blue-500 hover:text-blue-600 transition-colors" title="Edit">
+                        <Pencil size={18} />
+                      </button>
+                    )}
+                    {p.status === 'PENDING' && ['FINANCE', 'OWNER'].includes(role) && (
+                      <button onClick={() => handleDecline(p.id)} disabled={declineMutation.isPending} className="text-red-500 hover:text-red-600 transition-colors" title="Decline">
+                        <XCircle size={18} />
+                      </button>
+                    )}
+                  </div>
                   {p.status === 'PAID' && <span className="text-xs text-slate-400 dark:text-slate-500">Lunas</span>}
+                  {p.status === 'CANCELLED' && <span className="text-xs text-slate-400 dark:text-slate-500">Ditolak</span>}
                 </td>
               </tr>
             ))}
@@ -102,10 +140,10 @@ export default function PurchasesPage() {
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-[var(--bg-surface)] rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
             <div className="sticky top-0 bg-[var(--bg-surface)] flex items-center justify-between p-5 border-b border-slate-100 dark:border-slate-800">
-              <h2 className="font-display font-semibold text-slate-800 dark:text-slate-100">Buat Purchase Request</h2>
+              <h2 className="font-display font-semibold text-slate-800 dark:text-slate-100">{editId ? 'Edit Purchase Request' : 'Buat Purchase Request'}</h2>
               <button onClick={() => setModal(false)} className="text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:text-slate-300"><X size={18} /></button>
             </div>
-            <form onSubmit={e => { e.preventDefault(); if (!items.length) return toast.error('Tambahkan minimal 1 item'); createMutation.mutate({ ...form, items }) }} className="p-5 space-y-5">
+            <form onSubmit={e => { e.preventDefault(); if (!items.length) return toast.error('Tambahkan minimal 1 item'); editId ? updateMutation.mutate({ ...form, items }) : createMutation.mutate({ ...form, items }) }} className="p-5 space-y-5">
               <div className="grid grid-cols-2 gap-4">
                 <div><label className="label">Supplier *</label>
                   <select className="input" value={form.supplierId} onChange={e => setForm({ ...form, supplierId: e.target.value })} required>
@@ -162,8 +200,8 @@ export default function PurchasesPage() {
 
               <div className="flex gap-3 pt-2">
                 <button type="button" onClick={() => setModal(false)} className="btn-secondary flex-1 justify-center">Batal</button>
-                <button type="submit" disabled={createMutation.isPending} className="btn-primary flex-1 justify-center">
-                  {createMutation.isPending && <Loader2 size={14} className="animate-spin" />} Buat PR
+                <button type="submit" disabled={createMutation.isPending || updateMutation.isPending} className="btn-primary flex-1 justify-center">
+                  {(createMutation.isPending || updateMutation.isPending) && <Loader2 size={14} className="animate-spin" />} {editId ? 'Update PR' : 'Buat PR'}
                 </button>
               </div>
             </form>
