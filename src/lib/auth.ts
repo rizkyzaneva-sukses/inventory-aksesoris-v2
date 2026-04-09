@@ -11,12 +11,34 @@ export const authOptions: NextAuthOptions = {
       name: 'credentials',
       credentials: { email: { type: 'email' }, password: { type: 'password' } },
       async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) return null
-        const user = await prisma.user.findUnique({ where: { email: credentials.email } })
-        if (!user || !user.isActive) return null
-        const ok = await bcrypt.compare(credentials.password, user.password)
-        if (!ok) return null
-        return { id: user.id, email: user.email, name: user.name, role: user.role } as any
+        console.log("🔒 Login attempt for:", credentials?.email)
+        if (!credentials?.email || !credentials?.password) {
+          console.log("❌ Missing email or password")
+          return null
+        }
+        
+        try {
+          const user = await prisma.user.findUnique({ where: { email: credentials.email } })
+          if (!user) {
+            console.log("❌ User not found in DB")
+            return null
+          }
+          if (!user.isActive) {
+            console.log("❌ User is inactive")
+            return null
+          }
+          const ok = await bcrypt.compare(credentials.password, user.password)
+          if (!ok) {
+            console.log("❌ Invalid password")
+            return null
+          }
+          
+          console.log("✅ Login successful for:", user.email)
+          return { id: user.id, email: user.email, name: user.name, role: user.role } as any
+        } catch (error) {
+          console.error("🔥 DB Error during login:", error)
+          return null
+        }
       },
     }),
   ],
