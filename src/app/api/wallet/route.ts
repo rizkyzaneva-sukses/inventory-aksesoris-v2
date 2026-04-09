@@ -2,8 +2,9 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { WalletEntityType } from '@prisma/client'
 
-async function getBalance(entityType: string) {
+async function getBalance(entityType: WalletEntityType) {
   const last = await prisma.walletLedger.findFirst({ where: { entityType }, orderBy: { createdAt: 'desc' } })
   return last?.balanceAfter ?? 0
 }
@@ -14,7 +15,7 @@ export async function GET(req: NextRequest) {
   if (!['FINANCE', 'OWNER'].includes((session.user as any).role)) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
   const { searchParams } = new URL(req.url)
-  const entityType = searchParams.get('entity')
+  const entityType = searchParams.get('entity') as WalletEntityType | null
 
   const [financeBalance, gudangBalance, konveksiBalance] = await Promise.all([
     getBalance('FINANCE'), getBalance('GUDANG'), getBalance('KONVEKSI'),
