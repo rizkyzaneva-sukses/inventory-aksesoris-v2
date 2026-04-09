@@ -28,7 +28,7 @@ export async function GET(request: Request) {
     if (schemaPushed) break
     try {
       logs.push(`🔄 Mencoba: ${prismaCmd} db push...`)
-      const output = execSync(`${prismaCmd} db push --skip-generate --accept-data-loss 2>&1`, {
+      const output = execSync(`${prismaCmd} db push --accept-data-loss 2>&1`, {
         env: { ...process.env },
         stdio: 'pipe',
         timeout: 120000,

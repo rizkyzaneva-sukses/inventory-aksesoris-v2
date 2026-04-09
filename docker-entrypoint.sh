@@ -31,29 +31,29 @@ echo "✅ Database is reachable!"
 echo "📦 Syncing database schema..."
 SCHEMA_PUSHED=false
 
-# Cara 1: npx prisma
+# Cara 1: prisma global (installed via npm install -g prisma)
 if [ "$SCHEMA_PUSHED" = "false" ]; then
-  echo "Mencoba: npx prisma db push..."
-  npx prisma db push --skip-generate --accept-data-loss 2>&1 && SCHEMA_PUSHED=true || echo "⚠️ npx prisma gagal"
+  echo "Mencoba: prisma db push (global)..."
+  prisma db push --accept-data-loss 2>&1 && SCHEMA_PUSHED=true || echo "⚠️ prisma global gagal"
 fi
 
-# Cara 2: node_modules/.bin/prisma
+# Cara 2: npx prisma
 if [ "$SCHEMA_PUSHED" = "false" ]; then
-  echo "Mencoba: ./node_modules/.bin/prisma db push..."
-  ./node_modules/.bin/prisma db push --skip-generate --accept-data-loss 2>&1 && SCHEMA_PUSHED=true || echo "⚠️ ./node_modules/.bin/prisma gagal"
+  echo "Mencoba: npx prisma db push..."
+  npx prisma db push --accept-data-loss 2>&1 && SCHEMA_PUSHED=true || echo "⚠️ npx prisma gagal"
 fi
 
 # Cara 3: node modules/prisma/build
 if [ "$SCHEMA_PUSHED" = "false" ]; then
   echo "Mencoba: node ./node_modules/prisma/build/index.js db push..."
-  node ./node_modules/prisma/build/index.js db push --skip-generate --accept-data-loss 2>&1 && SCHEMA_PUSHED=true || echo "⚠️ node prisma/build gagal"
+  node ./node_modules/prisma/build/index.js db push --accept-data-loss 2>&1 && SCHEMA_PUSHED=true || echo "⚠️ node prisma/build gagal"
 fi
 
-# Cara 4: retry npx setelah delay
+# Cara 4: retry prisma global setelah delay
 if [ "$SCHEMA_PUSHED" = "false" ]; then
   echo "⏳ Retry setelah 5 detik..."
   sleep 5
-  npx prisma db push --skip-generate --accept-data-loss 2>&1 && SCHEMA_PUSHED=true || echo "⚠️ Schema sync gagal - gunakan /api/setup endpoint"
+  prisma db push --accept-data-loss 2>&1 && SCHEMA_PUSHED=true || echo "⚠️ Schema sync gagal - gunakan /api/setup endpoint"
 fi
 
 if [ "$SCHEMA_PUSHED" = "true" ]; then
